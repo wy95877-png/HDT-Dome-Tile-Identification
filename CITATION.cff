@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+
+title: "HDT Dome Tile Identification"
+
+type: software
+
+authors:
+  - family-names: "Wang"
+    given-names: "Yang"
+    affiliation: "Universitat Politècnica de València"
+
+version: 1.0.1
+
+date-released: 2026-11-18
+
+repository-code: "https://github.com/wy95877-png/HDT-Dome-Tile-Identification"
+
+abstract: >
+  Dynamo and Python workflow for automated component-level identification
+  of individual dome tiles in an HBIM model. The workflow performs sector
+  classification, local U/V indexing, persistent HDT component identifier
+  generation, and automatic assignment of HDT-oriented parameters.
+
+keywords:
+  - HBIM
+  - Historic Digital Twin
+  - Dynamo
+  - Revit
+  - component identification
+  - openBIM
