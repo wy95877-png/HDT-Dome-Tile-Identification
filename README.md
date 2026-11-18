@@ -29,6 +29,19 @@ The implemented procedure:
 
 - `automated_component_identification.py`  
   Python routine used within Dynamo for sector classification, local U/V indexing, persistent identifier generation, and parameter assignment.
+  
+ ## Software requirements
+
+The workflow was developed and tested using:
+
+- Autodesk Revit [2026]
+- Dynamo for Revit 3.6.1.2665
+- Dynamo Core 3.6.1.9895
+- Python Script node within Dynamo
+- Autodesk Revit API
+- RevitServices libraries
+
+The `.dyn` file is intended to be executed within Dynamo for Revit.
 
 ## Inputs
 
