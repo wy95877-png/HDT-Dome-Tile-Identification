@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it using the metadata below."
 
-title: "HDT Dome Tile Identification"
+title: "HDT Dome and Roof Tile Identification"
 
 type: software
 
@@ -10,22 +10,27 @@ authors:
     given-names: "Yang"
     affiliation: "Universitat Politècnica de València"
 
-version: 1.0.1
+version: 2.0.0
 
-date-released: 2026-11-18
+date-released: 2026-11-24
 
 repository-code: "https://github.com/wy95877-png/HDT-Dome-Tile-Identification"
 
 abstract: >
-  Dynamo and Python workflow for automated component-level identification
-  of individual dome tiles in an HBIM model. The workflow performs sector
-  classification, local U/V indexing, persistent HDT component identifier
-  generation, and automatic assignment of HDT-oriented parameters.
+  Dynamo and Python workflows for automated component-level identification
+  of dome and roof tiles in an HBIM model. The software uses the native
+  parametric organization of Revit DividedSurface elements and GridNode
+  indices to generate persistent HDT component identifiers, including
+  regular dome tiles, dome boundary tiles, and roof-sector tiles, and
+  automatically assigns HDT-oriented instance parameters.
 
 keywords:
   - HBIM
   - Historic Digital Twin
   - Dynamo
   - Revit
+  - DividedSurface
+  - GridNode
   - component identification
+  - semantic enrichment
   - openBIM
