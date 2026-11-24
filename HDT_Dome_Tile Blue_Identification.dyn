@@ -1,0 +1,950 @@
+{
+  "Uuid": "ab377222-d04e-4315-a69a-1ee9f0a007bd",
+  "IsCustomNode": false,
+  "Description": "Blue roof tiles only. Excludes Curved Roof Tile_White before native U/V normalization and HDT parameter writing.",
+  "Name": "HDT_Dome_Tile_Identification",
+  "ElementResolver": {
+    "ResolutionMap": {
+      "List.Count": {
+        "Key": "List",
+        "Value": "BuiltIn.ds"
+      },
+      "List.UniqueItems": {
+        "Key": "List",
+        "Value": "BuiltIn.ds"
+      }
+    }
+  },
+  "Inputs": [],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "DSRevitNodesUI.Categories, DSRevitNodesUI",
+      "SelectedIndex": 160,
+      "SelectedString": "OST_CurtainWallPanels",
+      "Id": "c25f526a13f7410cb99337df26554f6a",
+      "NodeType": "ExtensionNode",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "d8ee80c7240146d5b848a9d663f5ae7f",
+          "Name": "Category",
+          "Description": "The selected Category.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "All built-in categories."
+    },
+    {
+      "ConcreteType": "DSRevitNodesUI.ElementsOfCategory, DSRevitNodesUI",
+      "Id": "aef60bc8463646439d9ddf39b29dbbc2",
+      "NodeType": "ExtensionNode",
+      "Inputs": [
+        {
+          "Id": "b872b1ad6898409cb8d4d747b9b170df",
+          "Name": "Category",
+          "Description": "The Category",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "543f1a67340948ebb2371030d1a151eb",
+          "Name": "Elements",
+          "Description": "An element class.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Get all elements of the specified category from the model."
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "Id": "fdcd5442ae93467a8d6ebdcf0be3f050",
+      "NodeType": "FunctionNode",
+      "Inputs": [
+        {
+          "Id": "c8036553c5084f5f85d2b155d7e855ef",
+          "Name": "element",
+          "Description": "Revit.Elements.Element",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "f2aec96f02ba41df8d278815b7985968",
+          "Name": "string",
+          "Description": "string",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "FunctionSignature": "Revit.Elements.Element.Name",
+      "Replication": "Auto",
+      "Description": "Get the Name of the Element\n\nElement.Name: string"
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "Id": "e50a5e7d469a48ad8c229a0a3224de1b",
+      "NodeType": "FunctionNode",
+      "Inputs": [
+        {
+          "Id": "7f3bba6aa492400d8643ffbb314d54ae",
+          "Name": "element",
+          "Description": "Revit.Elements.Element",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "89e2ab9ba95c484c9c3c428e60ae819b",
+          "Name": "ElementType",
+          "Description": "Element Type or Null.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "FunctionSignature": "Revit.Elements.Element.ElementType",
+      "Replication": "Auto",
+      "Description": "Returns the ElementType for this Element. Returns null if the Element cannot have an ElementType assigned.\n\nElement.ElementType: ElementType"
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "Id": "e2b5e43c294c41409c8248b0418070ec",
+      "NodeType": "FunctionNode",
+      "Inputs": [
+        {
+          "Id": "83e947188cf548edb19faa217131c306",
+          "Name": "list",
+          "Description": "List to filter duplicates out of.\n\nvar[]..[]",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "d18ef2a2e08440cb8e2bfac0eeef4e56",
+          "Name": "list",
+          "Description": "Filtered list.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "FunctionSignature": "DSCore.List.UniqueItems@var[]..[]",
+      "Replication": "Auto",
+      "Description": "Creates a new list containing all unique items in the given list.\n\nList.UniqueItems (list: var[]..[]): var[]..[]"
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "Id": "7450f371161d458495efe91ac40666e2",
+      "NodeType": "FunctionNode",
+      "Inputs": [
+        {
+          "Id": "ffc35cc9cd2b4513a9c5969396563977",
+          "Name": "element",
+          "Description": "Revit.Elements.Element",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "86465786aece404da1294fe64295e196",
+          "Name": "ElementType",
+          "Description": "Element Type or Null.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "FunctionSignature": "Revit.Elements.Element.ElementType",
+      "Replication": "Auto",
+      "Description": "Returns the ElementType for this Element. Returns null if the Element cannot have an ElementType assigned.\n\nElement.ElementType: ElementType"
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "Id": "0a436bee53a14f5484f46e7946b17bc3",
+      "NodeType": "FunctionNode",
+      "Inputs": [
+        {
+          "Id": "8606e001cc944d0783b66238a1968171",
+          "Name": "element",
+          "Description": "Revit.Elements.Element",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "5acaffaad498428796d5682cf587da13",
+          "Name": "string",
+          "Description": "string",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "FunctionSignature": "Revit.Elements.Element.Name",
+      "Replication": "Auto",
+      "Description": "Get the Name of the Element\n\nElement.Name: string"
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.CodeBlockNodeModel, DynamoCore",
+      "Id": "ce5e002a62ba4a4d8d756492caa0642a",
+      "NodeType": "CodeBlockNode",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "e18a43bcc28a47d8aaa375ff4dc30383",
+          "Name": "string",
+          "Description": "\"Curved Roof Tile_Blue\"",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Allows for DesignScript code to be authored directly",
+      "Code": "\"Curved Roof Tile_Blue\";"
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "Id": "2b61065c7073433098906737fa7dc8b8",
+      "NodeType": "FunctionNode",
+      "Inputs": [
+        {
+          "Id": "ac431268a22a47fb9b869d353ac1ade0",
+          "Name": "list",
+          "Description": "List to filter.\n\nvar[]..[]",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "9525ec529b694e75b966954bf0311a0f",
+          "Name": "mask",
+          "Description": "List of booleans representing a mask.\n\nvar[]..[]",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "8a98de4afc4f4c099e894bcecb8cf4dd",
+          "Name": "in",
+          "Description": "Items whose mask index is true.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "a710332e3e714434b6b6f8d654cb9373",
+          "Name": "out",
+          "Description": "Items whose mask index is false.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "FunctionSignature": "DSCore.List.FilterByBoolMask@var[]..[],var[]..[]",
+      "Replication": "Auto",
+      "Description": "Filters a sequence by looking up corresponding indices in a separate list of booleans.\n\nList.FilterByBoolMask (list: var[]..[], mask: var[]..[]): var[]..[]"
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "Id": "806bd5fe69664610b13aacab0db06f1a",
+      "NodeType": "FunctionNode",
+      "Inputs": [
+        {
+          "Id": "d959803988264dc98e77e82a06cda91b",
+          "Name": "list",
+          "Description": "List to get the item count of.\n\nvar[]..[]",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "74a7dec81a9f48f7b635620606c31bc7",
+          "Name": "int",
+          "Description": "List length.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "FunctionSignature": "DSCore.List.Count@var[]..[]",
+      "Replication": "Auto",
+      "Description": "Returns the number of items stored in the given list.\n\nList.Count (list: var[]..[]): int"
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "Id": "931763571a5545f6827190e9f41bcf5c",
+      "NodeType": "FunctionNode",
+      "Inputs": [
+        {
+          "Id": "75a94132100f4331879ae2cc2bd58015",
+          "Name": "string",
+          "Description": "String to search in\n\nstring",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "eac447853492441288b3fc6c8085d523",
+          "Name": "searchFor",
+          "Description": "Substring to search for\n\nstring",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "d6917699435e416993496156d07d7d71",
+          "Name": "ignoreCase",
+          "Description": "Whether or not comparison takes case into account\n\nbool\nDefault value : false",
+          "UsingDefaultValue": true,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "7e41b0351e1c41f6a08a083e68035149",
+          "Name": "bool",
+          "Description": "Whether the string contains the substring",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "FunctionSignature": "DSCore.String.Contains@string,string,bool",
+      "Replication": "Auto",
+      "Description": "Determines if the given string contains the given substring.\n\nString.Contains (string: string, searchFor: string, ignoreCase: bool = false): bool"
+    },
+    {
+      "ConcreteType": "Dynamo.Nodes.DSModelElementSelection, DSRevitNodesUI",
+      "NodeType": "ExtensionNode",
+      "InstanceId": [
+        "223988dc-058f-4152-bddf-c176215faf4b-00094629"
+      ],
+      "Id": "fbdfa2b35b044cd8a00c01093fb92204",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "43c5fcfe747943c79c5eea0efa920a9c",
+          "Name": "Element",
+          "Description": "The selected elements.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Select a model element from the document."
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\nimport math\nfrom collections import defaultdict, Counter\n\nclr.AddReference(\"RevitAPI\")\nimport Autodesk.Revit.DB as DB\n\nclr.AddReference(\"RevitServices\")\nfrom RevitServices.Persistence import DocumentManager\nfrom RevitServices.Transactions import TransactionManager\n\ndoc = DocumentManager.Instance.CurrentDBDocument\n\n# ============================================================\n# UNIVERSAL SETTINGS\n# ============================================================\nDOME_CODE = \"D01\"\nPARENT_ID = \"DOME_01\"\nWRITE_TO_REVIT = True\nMAX_MATCH_DISTANCE_FT = 0.30\nMAX_METHOD_U_POSITIONS = 25   # user/model convention for each sector\n\n# ============================================================\n# HELPERS\n# ============================================================\ndef unwrap(x):\n    try:\n        return UnwrapElement(x)\n    except:\n        return x\n\ndef flatten(items):\n    if items is None:\n        return []\n    if isinstance(items, (list, tuple)):\n        out=[]\n        for x in items:\n            out.extend(flatten(x))\n        return out\n    return [items]\n\ndef eid(e):\n    if e is None:\n        return None\n    try:\n        return e.Id.Value\n    except:\n        try:\n            return e.Id.IntegerValue\n        except:\n            return None\n\ndef point_of(e):\n    if e is None:\n        return None\n    try:\n        loc=e.Location\n        if isinstance(loc, DB.LocationPoint):\n            return loc.Point\n    except:\n        pass\n    try:\n        return e.GetTransform().Origin\n    except:\n        pass\n    try:\n        bb=e.get_BoundingBox(None)\n        if bb:\n            return DB.XYZ((bb.Min.X+bb.Max.X)/2.0,\n                          (bb.Min.Y+bb.Max.Y)/2.0,\n                          (bb.Min.Z+bb.Max.Z)/2.0)\n    except:\n        pass\n    return None\n\ndef dist2(p,q):\n    dx=p.X-q.X; dy=p.Y-q.Y; dz=p.Z-q.Z\n    return dx*dx+dy*dy+dz*dz\n\ndef corr(xs,ys):\n    n=min(len(xs),len(ys))\n    if n<3: return 0.0\n    xs=xs[:n]; ys=ys[:n]\n    mx=sum(xs)/float(n); my=sum(ys)/float(n)\n    dx=[x-mx for x in xs]; dy=[y-my for y in ys]\n    denx=math.sqrt(sum(x*x for x in dx)); deny=math.sqrt(sum(y*y for y in dy))\n    if denx<1e-12 or deny<1e-12: return 0.0\n    return sum(dx[i]*dy[i] for i in range(n))/(denx*deny)\n\ndef circular_mean(angles):\n    if not angles: return 0.0\n    return math.atan2(sum(math.sin(a) for a in angles),sum(math.cos(a) for a in angles))\n\ndef near_angle(a,c):\n    return math.atan2(math.sin(a-c),math.cos(a-c))\n\ndef norm_name(s):\n    try:\n        return ''.join(ch.lower() for ch in str(s) if ch.isalnum())\n    except:\n        return ''\n\ndef element_identity_text(e):\n    parts=[]\n    if e is None:\n        return \"\"\n    try:\n        parts.append(str(e.Name))\n    except:\n        pass\n    try:\n        sym=e.Symbol\n        if sym is not None:\n            try: parts.append(str(sym.Name))\n            except: pass\n            try:\n                fam=sym.Family\n                if fam is not None: parts.append(str(fam.Name))\n            except:\n                pass\n    except:\n        pass\n    try:\n        tid=e.GetTypeId()\n        if tid is not None and tid != DB.ElementId.InvalidElementId:\n            et=doc.GetElement(tid)\n            if et is not None:\n                try: parts.append(str(et.Name))\n                except: pass\n                try: parts.append(str(et.FamilyName))\n                except: pass\n    except:\n        pass\n    return \" | \".join(parts)\n\ndef is_blue_tile(e):\n    return \"curvedrooftileblue\" in norm_name(element_identity_text(e))\n\ndef is_white_tile(e):\n    return \"curvedrooftilewhite\" in norm_name(element_identity_text(e))\n\ndef find_param(e, wanted):\n    try:\n        p=e.LookupParameter(wanted)\n        if p is not None:\n            return p\n    except:\n        pass\n    nw=norm_name(wanted)\n    try:\n        for p in e.Parameters:\n            try:\n                if norm_name(p.Definition.Name)==nw:\n                    return p\n            except:\n                pass\n    except:\n        pass\n    return None\n\ndef has_hdt_params(e):\n    return all(find_param(e,n) is not None for n in [\"HDT_Element_ID\",\"HDT_Parent_ID\",\"HDT_Zone\"])\n\ndef normalize_sector_code(x):\n    s=str(x).strip().upper() if x is not None else \"\"\n    if s.startswith(\"S\") and len(s)==3 and s[1:].isdigit():\n        n=int(s[1:])\n        if 1 <= n <= 7:\n            return \"S{:02d}\".format(n)\n    return None\n\n# ============================================================\n# INPUTS\n# IN[0] = all project roof Curtain Panels from existing graph\n# IN[1] = selected real DividedSurface (Select Model Element)\n# IN[2] = Select Divided Surface Families output for SAME surface\n# IN[3] = sector code string, e.g. S01 ... S07\n# ============================================================\nproject_tiles=[unwrap(x) for x in flatten(IN[0])]\nproject_tiles=[x for x in project_tiles if x is not None and is_blue_tile(x)]\nselected_ds=unwrap(IN[1]) if len(IN)>1 else None\nselected_native=[unwrap(x) for x in flatten(IN[2])] if len(IN)>2 else []\nselected_native_all=[x for x in selected_native if x is not None]\nselected_native=[x for x in selected_native_all if is_blue_tile(x)]\nsector_code=normalize_sector_code(IN[3] if len(IN)>3 else None)\nerrors=[]\n\n# Project roof tile points also provide a stable dome XY center.\nproject_ready=[]\nall_project_pts=[]\nfor e in project_tiles:\n    p=point_of(e)\n    if p is not None:\n        all_project_pts.append(p)\n    if has_hdt_params(e) and p is not None:\n        project_ready.append({\"element\":e,\"ElementId\":eid(e),\"point\":p})\n\nif all_project_pts:\n    dome_cx=sum(p.X for p in all_project_pts)/float(len(all_project_pts))\n    dome_cy=sum(p.Y for p in all_project_pts)/float(len(all_project_pts))\nelse:\n    dome_cx=dome_cy=0.0\n\nstop_reasons=[]\nif sector_code is None:\n    stop_reasons.append(\"invalid sector code; use S01 ... S07\")\nif selected_ds is None or not isinstance(selected_ds,DB.DividedSurface):\n    stop_reasons.append(\"IN[1] is not Autodesk.Revit.DB.DividedSurface\")\nif len(selected_native)==0:\n    stop_reasons.append(\"Select Divided Surface Families returned no tile instances\")\n\nif stop_reasons:\n    OUT=[\n        [\"MODE\",\"V18.1 BLUE-ONLY UNIVERSAL SECTOR WRITER\"],\n        [\"STATUS\",\"STOPPED\"],\n        [\"Reasons\",stop_reasons],\n        [\"Sector code\",sector_code],\n        [\"Selected DividedSurface ElementId\",eid(selected_ds)],\n        [\"Selected Divided Surface Families count\",len(selected_native)],\n    ]\nelse:\n    ds=selected_ds\n    nu=ds.NumberOfUGridlines\n    nv=ds.NumberOfVGridlines\n\n    # --------------------------------------------------------\n    # A. TRUE native GridNode -> tile mapping\n    # --------------------------------------------------------\n    native_by_id={}\n    duplicate_grid_instances=[]\n    for u in range(nu):\n        for v in range(nv):\n            node=DB.GridNode(u,v)\n            try:\n                if not ds.IsSeedNode(node):\n                    continue\n            except:\n                continue\n            # rectangular pattern normally has one tile/seed; 4 keeps this robust\n            for tile_index in range(4):\n                try:\n                    fi=ds.GetTileFamilyInstance(node,tile_index)\n                except:\n                    fi=None\n                if fi is None:\n                    continue\n                k=eid(fi)\n                if k is None:\n                    continue\n                rec={\n                    \"native_element\":fi,\n                    \"native_ElementId\":k,\n                    \"native_U\":int(u),\n                    \"native_V\":int(v),\n                    \"tile_index\":int(tile_index),\n                }\n                if k in native_by_id:\n                    old=native_by_id[k]\n                    if old[\"native_U\"]!=u or old[\"native_V\"]!=v:\n                        duplicate_grid_instances.append((k,old[\"native_U\"],old[\"native_V\"],u,v))\n                else:\n                    native_by_id[k]=rec\n    native_all=list(native_by_id.values())\n    native=[r for r in native_all if is_blue_tile(r[\"native_element\"])]\n    excluded_white_native=[r for r in native_all if is_white_tile(r[\"native_element\"])]\n    excluded_other_native=[r for r in native_all if (not is_blue_tile(r[\"native_element\"]) and not is_white_tile(r[\"native_element\"]))]\n\n    # Validate that the special selection node and the selected DS are the same surface.\n    selected_ids=set(eid(x) for x in selected_native if eid(x) is not None)\n    native_ids=set(r[\"native_ElementId\"] for r in native)\n    common_ids=selected_ids.intersection(native_ids)\n    only_selection=selected_ids-native_ids\n    only_grid=native_ids-selected_ids\n    selection_match_ratio=(len(common_ids)/float(max(1,len(native_ids))))\n\n    # --------------------------------------------------------\n    # B. Native axes -> methodological U/V\n    #    Use true dome center from ALL project roof tiles.\n    # --------------------------------------------------------\n    rows=[]\n    angles=[]\n    for r in native:\n        p=point_of(r[\"native_element\"])\n        if p is None:\n            continue\n        r[\"native_point\"]=p\n        a=math.atan2(p.Y-dome_cy,p.X-dome_cx)\n        r[\"Z\"]=p.Z\n        r[\"angle\"]=a\n        angles.append(a)\n        rows.append(r)\n\n    sector_mean_angle=circular_mean(angles)\n    for r in rows:\n        r[\"local_angle\"]=near_angle(r[\"angle\"],sector_mean_angle)\n\n    us=[float(r[\"native_U\"]) for r in rows]\n    vs=[float(r[\"native_V\"]) for r in rows]\n    zs=[float(r[\"Z\"]) for r in rows]\n    angs=[float(r[\"local_angle\"]) for r in rows]\n    cuZ=corr(us,zs); cvZ=corr(vs,zs)\n    cuA=corr(us,angs); cvA=corr(vs,angs)\n\n    # Meridional axis = native axis with stronger height correlation.\n    if abs(cuZ)>=abs(cvZ):\n        mer_native=\"native_U\"\n        circ_native=\"native_V\"\n    else:\n        mer_native=\"native_V\"\n        circ_native=\"native_U\"\n\n    # V: preserve true native-row membership, then rank apex -> eave by mean Z.\n    mer_groups=defaultdict(list)\n    circ_groups=defaultdict(list)\n    for r in rows:\n        mer_groups[r[mer_native]].append(r)\n        circ_groups[r[circ_native]].append(r)\n\n    mer_order=sorted(\n        mer_groups.keys(),\n        key=lambda k:sum(x[\"Z\"] for x in mer_groups[k])/float(len(mer_groups[k])),\n        reverse=True\n    )\n    v_rank={raw:i+1 for i,raw in enumerate(mer_order)}\n\n    # U: global column system for the sector. Do NOT restart U row-by-row.\n    # Order each native circumferential grid coordinate by its mean physical polar angle.\n    circ_order=sorted(\n        circ_groups.keys(),\n        key=lambda k:sum(x[\"local_angle\"] for x in circ_groups[k])/float(len(circ_groups[k]))\n    )\n    u_rank={raw:i+1 for i,raw in enumerate(circ_order)}\n\n    for r in rows:\n        r[\"U\"]=u_rank[r[circ_native]]\n        r[\"V\"]=v_rank[r[mer_native]]\n        r[\"HDT_Element_ID\"]=\"{}_{}_U{:02d}_V{:02d}\".format(DOME_CODE,sector_code,r[\"U\"],r[\"V\"])\n\n    ids=[r[\"HDT_Element_ID\"] for r in rows]\n    dup_ids=sorted([k for k,c in Counter(ids).items() if c>1])\n    coord_counts=Counter((r[\"U\"],r[\"V\"]) for r in rows)\n    dup_coords=sorted([k for k,c in coord_counts.items() if c>1])\n    u_positions=len(set(r[\"U\"] for r in rows))\n    v_positions=len(set(r[\"V\"] for r in rows))\n\n    # --------------------------------------------------------\n    # C. Match native DS tiles to visible project Curtain Panels\n    # --------------------------------------------------------\n    ready_by_id={x[\"ElementId\"]:x for x in project_ready if x[\"ElementId\"] is not None}\n    match_records=[]\n    for r in rows:\n        target=None; d=None; method=None\n        nk=r[\"native_ElementId\"]\n        if nk in ready_by_id:\n            target=ready_by_id[nk][\"element\"]\n            d=0.0\n            method=\"same ElementId\"\n        else:\n            p=r.get(\"native_point\")\n            best=None; bestd2=None\n            if p is not None:\n                for x in project_ready:\n                    dd=dist2(p,x[\"point\"])\n                    if bestd2 is None or dd<bestd2:\n                        bestd2=dd; best=x\n            if best is not None:\n                target=best[\"element\"]\n                d=math.sqrt(bestd2)\n                method=\"nearest project panel\"\n        rr=dict(r)\n        rr[\"target_element\"]=target\n        rr[\"target_ElementId\"]=eid(target)\n        rr[\"match_distance_ft\"]=d\n        rr[\"match_method\"]=method\n        match_records.append(rr)\n\n    matched=[r for r in match_records if r[\"target_element\"] is not None]\n    target_ids=[r[\"target_ElementId\"] for r in matched]\n    duplicate_targets=sorted([k for k,c in Counter(target_ids).items() if k is not None and c>1])\n    distances=[r[\"match_distance_ft\"] for r in matched if r[\"match_distance_ft\"] is not None]\n    max_dist=max(distances) if distances else None\n    mean_dist=sum(distances)/float(len(distances)) if distances else None\n    over_limit=[r for r in matched if r[\"match_distance_ft\"] is not None and r[\"match_distance_ft\"]>MAX_MATCH_DISTANCE_FT]\n\n    # --------------------------------------------------------\n    # D. Safety gate + write\n    # --------------------------------------------------------\n    block=[]\n    if len(rows)==0: block.append(\"no native UV tiles\")\n    if selection_match_ratio < 0.98: block.append(\"Select Divided Surface Families does not match selected DividedSurface\")\n    if duplicate_grid_instances: block.append(\"native instance mapped to multiple GridNodes\")\n    if dup_ids: block.append(\"duplicate candidate IDs\")\n    if dup_coords: block.append(\"duplicate U/V coordinates\")\n    if u_positions > MAX_METHOD_U_POSITIONS: block.append(\"method U exceeds 25 positions\")\n    if len(matched)!=len(rows): block.append(\"not all native tiles matched to project panels\")\n    if duplicate_targets: block.append(\"multiple native tiles matched to same project panel\")\n    if over_limit: block.append(\"project-panel match distance exceeds safety limit\")\n    if sector_code is None: block.append(\"invalid sector code\")\n\n    write_failures=[]\n    written=0\n    if WRITE_TO_REVIT and not block:\n        try:\n            TransactionManager.Instance.EnsureInTransaction(doc)\n            for r in matched:\n                e=r[\"target_element\"]\n                vals={\n                    \"HDT_Element_ID\":r[\"HDT_Element_ID\"],\n                    \"HDT_Parent_ID\":PARENT_ID,\n                    \"HDT_Zone\":sector_code,\n                }\n                ok=True\n                for name,value in vals.items():\n                    p=find_param(e,name)\n                    if p is None:\n                        write_failures.append({\"ElementId\":r[\"target_ElementId\"],\"parameter\":name,\"reason\":\"parameter not found\"})\n                        ok=False\n                        continue\n                    try:\n                        if p.IsReadOnly:\n                            write_failures.append({\"ElementId\":r[\"target_ElementId\"],\"parameter\":name,\"reason\":\"read-only\"})\n                            ok=False\n                        else:\n                            p.Set(str(value))\n                    except Exception as ex:\n                        write_failures.append({\"ElementId\":r[\"target_ElementId\"],\"parameter\":name,\"reason\":str(ex)})\n                        ok=False\n                if ok:\n                    written+=1\n            TransactionManager.Instance.TransactionTaskDone()\n            status=\"WRITTEN\" if not write_failures else \"WRITTEN WITH PARAMETER FAILURES\"\n        except Exception as ex:\n            try:\n                TransactionManager.Instance.ForceCloseTransaction()\n            except:\n                pass\n            status=\"WRITE FAILED\"\n            errors.append(\"Transaction: \"+str(ex))\n    else:\n        status=\"BLOCKED: \"+\"; \".join(block) if block else \"PREVIEW ONLY\"\n\n    # --------------------------------------------------------\n    # OUTPUT\n    # --------------------------------------------------------\n    ordered=sorted(match_records,key=lambda r:(r[\"V\"],r[\"U\"]))\n    OUT=[\n        [\"MODE\",\"V18.2 NATIVE OCCUPIED-ROW UNIVERSAL SECTOR WRITER\"],\n        [\"Sector code\",sector_code],\n        [\"Selected DividedSurface ElementId\",eid(ds)],\n        [\"Selected Divided Surface Families count\",len(selected_ids)],\n        [\"Native GridNode BLUE tile count\",len(native_ids)],\n        [\"Excluded native WHITE tiles\",len(excluded_white_native)],\n        [\"Excluded native OTHER tiles\",len(excluded_other_native)],\n        [\"Selection/native agreement\",{\n            \"common\":len(common_ids),\n            \"only_selection\":len(only_selection),\n            \"only_grid\":len(only_grid),\n            \"match_ratio\":round(selection_match_ratio,5)\n        }],\n        [\"Grid settings\",{\n            \"API_U_gridlines\":nu,\n            \"API_V_gridlines\":nv,\n            \"UI_U_fixed_number\":getattr(ds.USpacingRule,\"Number\",None),\n            \"UI_V_fixed_number\":getattr(ds.VSpacingRule,\"Number\",None)\n        }],\n        [\"Axis mapping\",{\n            \"Method_U_circumferential_from\":circ_native,\n            \"Method_V_meridional_from\":mer_native,\n            \"native_U_vs_Z\":round(cuZ,5),\n            \"native_V_vs_Z\":round(cvZ,5),\n            \"native_U_vs_angle\":round(cuA,5),\n            \"native_V_vs_angle\":round(cvA,5)\n        }],\n        [\"Methodological grid\",{\n            \"U_positions\":u_positions,\n            \"V_positions\":v_positions,\n            \"candidate_ID_total\":len(ids),\n            \"duplicate_candidate_IDs\":len(dup_ids),\n            \"duplicate_UV_coordinates\":len(dup_coords),\n            \"max_U\":max([r[\"U\"] for r in rows]) if rows else None,\n            \"max_V\":max([r[\"V\"] for r in rows]) if rows else None\n        }],\n        [\"V indexing note\",\"V positions are based on occupied native GridNode rows; UI Fixed Number describes the spacing/grid rule and may differ from occupied tile rows at partial borders.\"],\n        [\"Project panel matching\",{\n            \"project_roof_tiles_input\":len(project_tiles),\n            \"project_panels_with_HDT_params\":len(project_ready),\n            \"matched\":len(matched),\n            \"duplicate_targets\":len(duplicate_targets),\n            \"mean_distance_ft\":round(mean_dist,6) if mean_dist is not None else None,\n            \"max_distance_ft\":round(max_dist,6) if max_dist is not None else None,\n            \"over_limit\":len(over_limit),\n            \"limit_ft\":MAX_MATCH_DISTANCE_FT\n        }],\n        [\"WRITE STATUS\",status],\n        [\"Elements fully written\",written],\n        [\"Parameter write failures\",write_failures[:30]],\n        [\"First 40 final mappings\",[\n            {\n                \"native_ElementId\":r[\"native_ElementId\"],\n                \"project_ElementId\":r[\"target_ElementId\"],\n                \"native_U\":r[\"native_U\"],\n                \"native_V\":r[\"native_V\"],\n                \"U\":r[\"U\"],\n                \"V\":r[\"V\"],\n                \"HDT_Element_ID\":r[\"HDT_Element_ID\"],\n                \"match_distance_ft\":round(r[\"match_distance_ft\"],6) if r[\"match_distance_ft\"] is not None else None\n            }\n            for r in ordered[:40]\n        ]],\n        [\"BLOCK reasons\",block],\n        [\"Errors\",errors[:30]],\n    ]\n",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "e7c83177532447af82a50cfa0c6da45a",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "8b21a5db90a94f2281dea8b0fd209efe",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "c1539c686ffa46c795c090359db39265",
+          "Name": "IN[1]",
+          "Description": "Input #1",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "e56cdd132d5e45ccb532a05d71d23e84",
+          "Name": "IN[2]",
+          "Description": "Input #2",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "adf2d9f201f44e308bfab2ea59c2d1e0",
+          "Name": "IN[3]",
+          "Description": "Input #3",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "061a213eaf954b9583287f3ef2d7c989",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.CodeBlockNodeModel, DynamoCore",
+      "Id": "5fd6983f99b94fd880b89d68fa5cce84",
+      "NodeType": "CodeBlockNode",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "c7fb4fc7d1974d208bd83eef75b4d2c4",
+          "Name": "string",
+          "Description": "\"Curved Roof Tile_White\"",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Allows for DesignScript code to be authored directly",
+      "Code": "\"Curved Roof Tile_White\";"
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "Id": "fe6e32029b8c47508e29cba6e881f52e",
+      "NodeType": "FunctionNode",
+      "Inputs": [
+        {
+          "Id": "f3e40a308f7c4a17a4829edf0274c727",
+          "Name": "string",
+          "Description": "String to search in\n\nstring",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "eb79fe6d130b4b75bda5037ee7fcb484",
+          "Name": "searchFor",
+          "Description": "Substring to search for\n\nstring",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "72252c0297d84eb0a1e3a8f7712635a7",
+          "Name": "ignoreCase",
+          "Description": "Whether or not comparison takes case into account\n\nbool\nDefault value : false",
+          "UsingDefaultValue": true,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "c79a32a5f32546d6b5e6cd54b6a07797",
+          "Name": "bool",
+          "Description": "Whether the string contains the substring",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "FunctionSignature": "DSCore.String.Contains@string,string,bool",
+      "Replication": "Auto",
+      "Description": "Determines if the given string contains the given substring.\n\nString.Contains (string: string, searchFor: string, ignoreCase: bool = false): bool"
+    },
+    {
+      "ConcreteType": "CoreNodeModels.Logic.Or, CoreNodeModels",
+      "VariableInputPorts": true,
+      "Id": "2e324bd478474b2c9c6e3383ad5533f2",
+      "NodeType": "ExtensionNode",
+      "Inputs": [
+        {
+          "Id": "8da0b322958c469eba74a7d518180022",
+          "Name": "bool0",
+          "Description": "Boolean #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "9e29d0b9233949999d0a122332f29a2b",
+          "Name": "bool1",
+          "Description": "Boolean #1",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "40c816410e6d455b920b950aace362a7",
+          "Name": "bool",
+          "Description": "Result block produced",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Auto",
+      "Description": "Boolean OR: Returns True if any of the inputs are true. If none are true, returns False."
+    },
+    {
+      "ConcreteType": "Dynamo.Nodes.DSDividedSurfaceFamiliesSelection, DSRevitNodesUI",
+      "NodeType": "ExtensionNode",
+      "InstanceId": [
+        "223988dc-058f-4152-bddf-c176215faf4b-00094629"
+      ],
+      "Id": "294a47707d8c4590b5bbca559859651b",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "0d0b4b4c454e4768ad69e23b5b4f0a6b",
+          "Name": "Element",
+          "Description": "The family instances hosted by the selected divided surface.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Select a divided surface and get its family instances."
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.CodeBlockNodeModel, DynamoCore",
+      "Id": "0e6d6270913d4256ae5211ff99e961a2",
+      "NodeType": "CodeBlockNode",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "f55394b53c274d4caa30fa94d612b1f3",
+          "Name": "string",
+          "Description": "\"S07\"",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Allows for DesignScript code to be authored directly",
+      "Code": "\"S07\";"
+    }
+  ],
+  "Connectors": [
+    {
+      "Start": "d8ee80c7240146d5b848a9d663f5ae7f",
+      "End": "b872b1ad6898409cb8d4d747b9b170df",
+      "Id": "78bc225bc27b4eacb3edd738973e875f",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "543f1a67340948ebb2371030d1a151eb",
+      "End": "7f3bba6aa492400d8643ffbb314d54ae",
+      "Id": "43383de9daca477ebb99affdd3378bf7",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "543f1a67340948ebb2371030d1a151eb",
+      "End": "ffc35cc9cd2b4513a9c5969396563977",
+      "Id": "81cc634b0e03426f9a6788c8b4c3b578",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "543f1a67340948ebb2371030d1a151eb",
+      "End": "ac431268a22a47fb9b869d353ac1ade0",
+      "Id": "4ca2cb132b834573ba492f5fb38648dc",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "f2aec96f02ba41df8d278815b7985968",
+      "End": "83e947188cf548edb19faa217131c306",
+      "Id": "cf93d376805c4c92bf0d5d6defa96cf8",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "89e2ab9ba95c484c9c3c428e60ae819b",
+      "End": "c8036553c5084f5f85d2b155d7e855ef",
+      "Id": "b796fb54934c4433b19865b64d848437",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "86465786aece404da1294fe64295e196",
+      "End": "8606e001cc944d0783b66238a1968171",
+      "Id": "ed397647c9714764b9074787df3f77e6",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "5acaffaad498428796d5682cf587da13",
+      "End": "75a94132100f4331879ae2cc2bd58015",
+      "Id": "e9cba6cb49b142ed88a0dbed393904ed",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "5acaffaad498428796d5682cf587da13",
+      "End": "f3e40a308f7c4a17a4829edf0274c727",
+      "Id": "dee77ec3755f45b697b30a81d23faf4f",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "e18a43bcc28a47d8aaa375ff4dc30383",
+      "End": "eac447853492441288b3fc6c8085d523",
+      "Id": "bd8b94b719d14d45931fd9b9a7932704",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "8a98de4afc4f4c099e894bcecb8cf4dd",
+      "End": "d959803988264dc98e77e82a06cda91b",
+      "Id": "f088e0fd9bed413c83d2a3032c7b2a81",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "8a98de4afc4f4c099e894bcecb8cf4dd",
+      "End": "8b21a5db90a94f2281dea8b0fd209efe",
+      "Id": "a210dc1eeb184d1690542c6f3de5a720",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "7e41b0351e1c41f6a08a083e68035149",
+      "End": "8da0b322958c469eba74a7d518180022",
+      "Id": "387972d339b34c45a8189a5fd928f05a",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "7e41b0351e1c41f6a08a083e68035149",
+      "End": "9525ec529b694e75b966954bf0311a0f",
+      "Id": "d5263f56fe394fcfba365fbcf269efe8",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "43c5fcfe747943c79c5eea0efa920a9c",
+      "End": "c1539c686ffa46c795c090359db39265",
+      "Id": "1a8609ba194d45da8b00bce5e7c974b7",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "c7fb4fc7d1974d208bd83eef75b4d2c4",
+      "End": "eb79fe6d130b4b75bda5037ee7fcb484",
+      "Id": "b330fddae03d42bb8bfb892478486a7f",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "c79a32a5f32546d6b5e6cd54b6a07797",
+      "End": "9e29d0b9233949999d0a122332f29a2b",
+      "Id": "15bf7cc451b64a1abe4c41eb07f17053",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "0d0b4b4c454e4768ad69e23b5b4f0a6b",
+      "End": "e56cdd132d5e45ccb532a05d71d23e84",
+      "Id": "0427ebb1c2be4b5d85db84c90c75f017",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "f55394b53c274d4caa30fa94d612b1f3",
+      "End": "adf2d9f201f44e308bfab2ea59c2d1e0",
+      "Id": "5bbba9cf1f834a5a8e093e5f2d6bbb2a",
+      "IsHidden": "False"
+    }
+  ],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [],
+  "EnableLegacyPolyCurveBehavior": true,
+  "Thumbnail": "",
+  "GraphDocumentationURL": null,
+  "ExtensionWorkspaceData": [
+    {
+      "ExtensionGuid": "28992e1d-abb9-417f-8b1b-05e053bee670",
+      "Name": "Properties",
+      "Version": "3.6",
+      "Data": {}
+    },
+    {
+      "ExtensionGuid": "DFBD9CC0-DB40-457A-939E-8C8555555A9D",
+      "Name": "Generative Design",
+      "Version": "9.1",
+      "Data": {}
+    }
+  ],
+  "Author": "OpenAI / ChatGPT",
+  "Linting": {
+    "activeLinter": "None",
+    "activeLinterId": "7b75fb44-43fd-4631-a878-29f4d5d8399a",
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "3.6.1.9895",
+      "RunType": "Manual",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "_Background Preview",
+      "EyeX": -26.678817749023438,
+      "EyeY": 27.087509155273438,
+      "EyeZ": 62.898738861083984,
+      "LookX": 14.95157241821289,
+      "LookY": -16.197538375854492,
+      "LookZ": -72.26593780517578,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    "ConnectorPins": [],
+    "NodeViews": [
+      {
+        "Id": "c25f526a13f7410cb99337df26554f6a",
+        "Name": "Categories",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": -29.643135599743005,
+        "Y": 124.2987117365858
+      },
+      {
+        "Id": "aef60bc8463646439d9ddf39b29dbbc2",
+        "Name": "All Elements of Category",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 260.8745239462587,
+        "Y": 119.56338477724967
+      },
+      {
+        "Id": "fdcd5442ae93467a8d6ebdcf0be3f050",
+        "Name": "Element.Name",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 904.6668557172803,
+        "Y": 449.58180603654074
+      },
+      {
+        "Id": "e50a5e7d469a48ad8c229a0a3224de1b",
+        "Name": "Element.ElementType",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 554.5639638107862,
+        "Y": 283.06219959467103
+      },
+      {
+        "Id": "e2b5e43c294c41409c8248b0418070ec",
+        "Name": "List.UniqueItems",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 1220.881317791276,
+        "Y": 253.07092930779487
+      },
+      {
+        "Id": "7450f371161d458495efe91ac40666e2",
+        "Name": "Element.ElementType",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 563.7509667520253,
+        "Y": -38.211192136188544
+      },
+      {
+        "Id": "0a436bee53a14f5484f46e7946b17bc3",
+        "Name": "Element.Name",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 899.1845247411927,
+        "Y": 9.737093054936224
+      },
+      {
+        "Id": "ce5e002a62ba4a4d8d756492caa0642a",
+        "Name": "Code Block",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 869.0773374689055,
+        "Y": 148.64172720764094
+      },
+      {
+        "Id": "2b61065c7073433098906737fa7dc8b8",
+        "Name": "List.FilterByBoolMask",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 1502.76951439002,
+        "Y": 151.43072389853768
+      },
+      {
+        "Id": "806bd5fe69664610b13aacab0db06f1a",
+        "Name": "List.Count",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 1799.6732466344995,
+        "Y": -26.878437412613835
+      },
+      {
+        "Id": "931763571a5545f6827190e9f41bcf5c",
+        "Name": "String.Contains",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 1216.3613672077724,
+        "Y": 46.59689533469958
+      },
+      {
+        "Id": "fbdfa2b35b044cd8a00c01093fb92204",
+        "Name": "Select Model Element",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 1796.8795053928384,
+        "Y": 102.11103343967699
+      },
+      {
+        "Id": "e7c83177532447af82a50cfa0c6da45a",
+        "Name": "Python Script",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 2202.8744718673884,
+        "Y": 52.0900246805931
+      },
+      {
+        "Id": "5fd6983f99b94fd880b89d68fa5cce84",
+        "Name": "Code Block",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 867.3903662841122,
+        "Y": 300.2879414913763
+      },
+      {
+        "Id": "fe6e32029b8c47508e29cba6e881f52e",
+        "Name": "String.Contains",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 1211.1819204654464,
+        "Y": -162.3053161536875
+      },
+      {
+        "Id": "2e324bd478474b2c9c6e3383ad5533f2",
+        "Name": "Or",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 1508.7439177789402,
+        "Y": -23.12289435561405
+      },
+      {
+        "Id": "294a47707d8c4590b5bbca559859651b",
+        "Name": "Select Divided Surface Families",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 1792.860340652389,
+        "Y": 246.85408957962932
+      },
+      {
+        "Id": "0e6d6270913d4256ae5211ff99e961a2",
+        "Name": "SECTOR CODE - CHANGE S01 TO S07",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 1792.0766265220543,
+        "Y": 491.3776843150499
+      }
+    ],
+    "Annotations": [],
+    "X": 143.99171156980788,
+    "Y": 422.0167223861582,
+    "Zoom": 0.5390307750947242
+  }
+}

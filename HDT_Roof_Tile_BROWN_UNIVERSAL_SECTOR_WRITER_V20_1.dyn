@@ -1,0 +1,293 @@
+{
+  "Uuid": "94fe1eb6-9e0b-43ad-81eb-e5d73fbddeeb",
+  "IsCustomNode": false,
+  "Description": "Clean universal ROOF sector writer. Select the roof DividedSurface and its Divided Surface Families; family/type is detected automatically. Change only sector code S01-S07.",
+  "Name": "HDT_Roof_Tile_BROWN_UNIVERSAL_SECTOR_WRITER_V20_1",
+  "ElementResolver": {
+    "ResolutionMap": {
+      "List.Count": {
+        "Key": "List",
+        "Value": "BuiltIn.ds"
+      },
+      "List.UniqueItems": {
+        "Key": "List",
+        "Value": "BuiltIn.ds"
+      }
+    }
+  },
+  "Inputs": [],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "Dynamo.Nodes.DSModelElementSelection, DSRevitNodesUI",
+      "NodeType": "ExtensionNode",
+      "InstanceId": [
+        "bec779a9-a7e7-496f-8227-190d8bfe60f8-0009e304"
+      ],
+      "Id": "cae07dd4fda94ca69bede986eaaa41c6",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "12f8fbda64954d6590475b1b8b1dfcea",
+          "Name": "Element",
+          "Description": "The selected elements.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Select a model element from the document."
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\nimport math\nfrom collections import defaultdict, Counter\n\nclr.AddReference(\"RevitAPI\")\nimport Autodesk.Revit.DB as DB\n\nclr.AddReference(\"RevitServices\")\nfrom RevitServices.Persistence import DocumentManager\nfrom RevitServices.Transactions import TransactionManager\n\ndoc = DocumentManager.Instance.CurrentDBDocument\n\n# ============================================================\n# UNIVERSAL SETTINGS\n# ============================================================\nROOF_CODE = \"R01\"\nPARENT_ID = \"ROOF_01\"\nWRITE_TO_REVIT = True\nMAX_MATCH_DISTANCE_FT = 0.30\n\n\n# ============================================================\n# HELPERS\n# ============================================================\ndef unwrap(x):\n    try:\n        return UnwrapElement(x)\n    except:\n        return x\n\ndef flatten(items):\n    if items is None:\n        return []\n    if isinstance(items, (list, tuple)):\n        out=[]\n        for x in items:\n            out.extend(flatten(x))\n        return out\n    return [items]\n\ndef eid(e):\n    if e is None:\n        return None\n    try:\n        return e.Id.Value\n    except:\n        try:\n            return e.Id.IntegerValue\n        except:\n            return None\n\ndef point_of(e):\n    if e is None:\n        return None\n    try:\n        loc=e.Location\n        if isinstance(loc, DB.LocationPoint):\n            return loc.Point\n    except:\n        pass\n    try:\n        return e.GetTransform().Origin\n    except:\n        pass\n    try:\n        bb=e.get_BoundingBox(None)\n        if bb:\n            return DB.XYZ((bb.Min.X+bb.Max.X)/2.0,\n                          (bb.Min.Y+bb.Max.Y)/2.0,\n                          (bb.Min.Z+bb.Max.Z)/2.0)\n    except:\n        pass\n    return None\n\ndef dist2(p,q):\n    dx=p.X-q.X; dy=p.Y-q.Y; dz=p.Z-q.Z\n    return dx*dx+dy*dy+dz*dz\n\ndef corr(xs,ys):\n    n=min(len(xs),len(ys))\n    if n<3: return 0.0\n    xs=xs[:n]; ys=ys[:n]\n    mx=sum(xs)/float(n); my=sum(ys)/float(n)\n    dx=[x-mx for x in xs]; dy=[y-my for y in ys]\n    denx=math.sqrt(sum(x*x for x in dx)); deny=math.sqrt(sum(y*y for y in dy))\n    if denx<1e-12 or deny<1e-12: return 0.0\n    return sum(dx[i]*dy[i] for i in range(n))/(denx*deny)\n\ndef circular_mean(angles):\n    if not angles: return 0.0\n    return math.atan2(sum(math.sin(a) for a in angles),sum(math.cos(a) for a in angles))\n\ndef near_angle(a,c):\n    return math.atan2(math.sin(a-c),math.cos(a-c))\n\ndef norm_name(s):\n    try:\n        return ''.join(ch.lower() for ch in str(s) if ch.isalnum())\n    except:\n        return ''\n\ndef element_identity_text(e):\n    parts=[]\n    if e is None:\n        return \"\"\n    try:\n        parts.append(str(e.Name))\n    except:\n        pass\n    try:\n        sym=e.Symbol\n        if sym is not None:\n            try: parts.append(str(sym.Name))\n            except: pass\n            try:\n                fam=sym.Family\n                if fam is not None: parts.append(str(fam.Name))\n            except:\n                pass\n    except:\n        pass\n    try:\n        tid=e.GetTypeId()\n        if tid is not None and tid != DB.ElementId.InvalidElementId:\n            et=doc.GetElement(tid)\n            if et is not None:\n                try: parts.append(str(et.Name))\n                except: pass\n                try: parts.append(str(et.FamilyName))\n                except: pass\n    except:\n        pass\n    return \" | \".join(parts)\n\ndef family_type_key(e):\n    if e is None:\n        return None\n    fam_name=\"\"; type_name=\"\"\n    try:\n        sym=e.Symbol\n        if sym is not None:\n            try:\n                type_name=str(sym.Name)\n            except:\n                pass\n            try:\n                fam=sym.Family\n                if fam is not None:\n                    fam_name=str(fam.Name)\n            except:\n                pass\n    except:\n        pass\n    if not fam_name or not type_name:\n        try:\n            tid=e.GetTypeId()\n            if tid is not None and tid != DB.ElementId.InvalidElementId:\n                et=doc.GetElement(tid)\n                if et is not None:\n                    if not type_name:\n                        try: type_name=str(et.Name)\n                        except: pass\n                    if not fam_name:\n                        try: fam_name=str(et.FamilyName)\n                        except: pass\n        except:\n            pass\n    key=norm_name(fam_name)+\"::\"+norm_name(type_name)\n    return key if key!=\"::\" else None\n\ndef find_param(e, wanted):\n    try:\n        p=e.LookupParameter(wanted)\n        if p is not None:\n            return p\n    except:\n        pass\n    nw=norm_name(wanted)\n    try:\n        for p in e.Parameters:\n            try:\n                if norm_name(p.Definition.Name)==nw:\n                    return p\n            except:\n                pass\n    except:\n        pass\n    return None\n\ndef has_hdt_params(e):\n    return all(find_param(e,n) is not None for n in [\"HDT_Element_ID\",\"HDT_Parent_ID\",\"HDT_Zone\"])\n\ndef normalize_sector_code(x):\n    s=str(x).strip().upper() if x is not None else \"\"\n    if s.startswith(\"S\") and len(s)==3 and s[1:].isdigit():\n        n=int(s[1:])\n        if 1 <= n <= 7:\n            return \"S{:02d}\".format(n)\n    return None\n\n# ============================================================\n# INPUTS\n# IN[0] = selected real ROOF DividedSurface (Select Model Element)\n# IN[1] = Select Divided Surface Families output for SAME surface\n# IN[2] = sector code string, e.g. S01 ... S07\n# ============================================================\n# Family/type is learned automatically from the selected roof DividedSurface families.\nselected_ds=unwrap(IN[0]) if len(IN)>0 else None\nselected_native_all=[unwrap(x) for x in flatten(IN[1])] if len(IN)>1 else []\nselected_native_all=[x for x in selected_native_all if x is not None]\nsector_code=normalize_sector_code(IN[2] if len(IN)>2 else None)\nerrors=[]\n\n# Family/type is learned from the selected Divided Surface Families, so no hard-coded brown family name is required.\nselected_keys=set(k for k in [family_type_key(x) for x in selected_native_all] if k)\nselected_native=[x for x in selected_native_all if family_type_key(x) in selected_keys]\n\n# Discover ALL project Curtain Panels having the same family/type as the selected native roof tiles.\ntry:\n    all_project_panels=list(DB.FilteredElementCollector(doc)\n        .OfCategory(DB.BuiltInCategory.OST_CurtainWallPanels)\n        .WhereElementIsNotElementType()\n        .ToElements())\nexcept:\n    all_project_panels=[]\n\nproject_tiles=[e for e in all_project_panels if family_type_key(e) in selected_keys]\n\n# Matching-family panels across all seven roof sectors provide a stable ROOF XY center.\nproject_ready=[]\nall_project_pts=[]\nfor e in project_tiles:\n    p=point_of(e)\n    if p is not None:\n        all_project_pts.append(p)\n    if has_hdt_params(e) and p is not None:\n        project_ready.append({\"element\":e,\"ElementId\":eid(e),\"point\":p})\n\nif all_project_pts:\n    roof_cx=sum(p.X for p in all_project_pts)/float(len(all_project_pts))\n    roof_cy=sum(p.Y for p in all_project_pts)/float(len(all_project_pts))\nelse:\n    roof_cx=roof_cy=0.0\n\nstop_reasons=[]\nif sector_code is None:\n    stop_reasons.append(\"invalid sector code; use S01 ... S07\")\nif selected_ds is None or not isinstance(selected_ds,DB.DividedSurface):\n    stop_reasons.append(\"IN[0] is not Autodesk.Revit.DB.DividedSurface\")\nif len(selected_native)==0:\n    stop_reasons.append(\"Select Divided Surface Families returned no tile instances\")\nif len(selected_keys)==0:\n    stop_reasons.append(\"could not identify selected brown roof family/type\")\nif len(project_tiles)==0:\n    stop_reasons.append(\"no project Curtain Panels match the selected roof family/type\")\n\nif stop_reasons:\n    OUT=[\n        [\"MODE\",\"V20.1 CLEAN ROOF UNIVERSAL SECTOR WRITER\"],\n        [\"STATUS\",\"STOPPED\"],\n        [\"Reasons\",stop_reasons],\n        [\"Sector code\",sector_code],\n        [\"Selected DividedSurface ElementId\",eid(selected_ds)],\n        [\"Selected Divided Surface Families count\",len(selected_native)],\n    ]\nelse:\n    ds=selected_ds\n    nu=ds.NumberOfUGridlines\n    nv=ds.NumberOfVGridlines\n\n    # --------------------------------------------------------\n    # A. TRUE native GridNode -> tile mapping\n    # --------------------------------------------------------\n    native_by_id={}\n    duplicate_grid_instances=[]\n    for u in range(nu):\n        for v in range(nv):\n            node=DB.GridNode(u,v)\n            try:\n                if not ds.IsSeedNode(node):\n                    continue\n            except:\n                continue\n            # rectangular pattern normally has one tile/seed; 4 keeps this robust\n            for tile_index in range(4):\n                try:\n                    fi=ds.GetTileFamilyInstance(node,tile_index)\n                except:\n                    fi=None\n                if fi is None:\n                    continue\n                k=eid(fi)\n                if k is None:\n                    continue\n                rec={\n                    \"native_element\":fi,\n                    \"native_ElementId\":k,\n                    \"native_U\":int(u),\n                    \"native_V\":int(v),\n                    \"tile_index\":int(tile_index),\n                }\n                if k in native_by_id:\n                    old=native_by_id[k]\n                    if old[\"native_U\"]!=u or old[\"native_V\"]!=v:\n                        duplicate_grid_instances.append((k,old[\"native_U\"],old[\"native_V\"],u,v))\n                else:\n                    native_by_id[k]=rec\n    native_all=list(native_by_id.values())\n    native=[r for r in native_all if family_type_key(r[\"native_element\"]) in selected_keys]\n    excluded_other_native=[r for r in native_all if family_type_key(r[\"native_element\"]) not in selected_keys]\n\n    # Validate that the special selection node and the selected DS are the same surface.\n    selected_ids=set(eid(x) for x in selected_native if eid(x) is not None)\n    native_ids=set(r[\"native_ElementId\"] for r in native)\n    common_ids=selected_ids.intersection(native_ids)\n    only_selection=selected_ids-native_ids\n    only_grid=native_ids-selected_ids\n    selection_match_ratio=(len(common_ids)/float(max(1,len(native_ids))))\n\n    # --------------------------------------------------------\n    # B. Native axes -> methodological U/V\n    #    Use true ROOF center from all matching project brown tiles.\n    # --------------------------------------------------------\n    rows=[]\n    angles=[]\n    for r in native:\n        p=point_of(r[\"native_element\"])\n        if p is None:\n            continue\n        r[\"native_point\"]=p\n        a=math.atan2(p.Y-roof_cy,p.X-roof_cx)\n        r[\"Z\"]=p.Z\n        r[\"angle\"]=a\n        angles.append(a)\n        rows.append(r)\n\n    sector_mean_angle=circular_mean(angles)\n    for r in rows:\n        r[\"local_angle\"]=near_angle(r[\"angle\"],sector_mean_angle)\n\n    us=[float(r[\"native_U\"]) for r in rows]\n    vs=[float(r[\"native_V\"]) for r in rows]\n    zs=[float(r[\"Z\"]) for r in rows]\n    angs=[float(r[\"local_angle\"]) for r in rows]\n    cuZ=corr(us,zs); cvZ=corr(vs,zs)\n    cuA=corr(us,angs); cvA=corr(vs,angs)\n\n    # Meridional axis = native axis with stronger height correlation.\n    if abs(cuZ)>=abs(cvZ):\n        mer_native=\"native_U\"\n        circ_native=\"native_V\"\n    else:\n        mer_native=\"native_V\"\n        circ_native=\"native_U\"\n\n    # V: preserve true native-row membership, then rank apex -> eave by mean Z.\n    mer_groups=defaultdict(list)\n    circ_groups=defaultdict(list)\n    for r in rows:\n        mer_groups[r[mer_native]].append(r)\n        circ_groups[r[circ_native]].append(r)\n\n    mer_order=sorted(\n        mer_groups.keys(),\n        key=lambda k:sum(x[\"Z\"] for x in mer_groups[k])/float(len(mer_groups[k])),\n        reverse=True\n    )\n    v_rank={raw:i+1 for i,raw in enumerate(mer_order)}\n\n    # U: global column system for the sector. Do NOT restart U row-by-row.\n    # Order each native circumferential grid coordinate by its mean physical polar angle.\n    circ_order=sorted(\n        circ_groups.keys(),\n        key=lambda k:sum(x[\"local_angle\"] for x in circ_groups[k])/float(len(circ_groups[k]))\n    )\n    u_rank={raw:i+1 for i,raw in enumerate(circ_order)}\n\n    for r in rows:\n        r[\"U\"]=u_rank[r[circ_native]]\n        r[\"V\"]=v_rank[r[mer_native]]\n        r[\"HDT_Element_ID\"]=\"{}_{}_U{:02d}_V{:02d}\".format(ROOF_CODE,sector_code,r[\"U\"],r[\"V\"])\n\n    ids=[r[\"HDT_Element_ID\"] for r in rows]\n    dup_ids=sorted([k for k,c in Counter(ids).items() if c>1])\n    coord_counts=Counter((r[\"U\"],r[\"V\"]) for r in rows)\n    dup_coords=sorted([k for k,c in coord_counts.items() if c>1])\n    u_positions=len(set(r[\"U\"] for r in rows))\n    v_positions=len(set(r[\"V\"] for r in rows))\n\n    # --------------------------------------------------------\n    # C. Match native DS tiles to visible project Curtain Panels\n    # --------------------------------------------------------\n    ready_by_id={x[\"ElementId\"]:x for x in project_ready if x[\"ElementId\"] is not None}\n    match_records=[]\n    for r in rows:\n        target=None; d=None; method=None\n        nk=r[\"native_ElementId\"]\n        if nk in ready_by_id:\n            target=ready_by_id[nk][\"element\"]\n            d=0.0\n            method=\"same ElementId\"\n        else:\n            p=r.get(\"native_point\")\n            best=None; bestd2=None\n            if p is not None:\n                for x in project_ready:\n                    dd=dist2(p,x[\"point\"])\n                    if bestd2 is None or dd<bestd2:\n                        bestd2=dd; best=x\n            if best is not None:\n                target=best[\"element\"]\n                d=math.sqrt(bestd2)\n                method=\"nearest project panel\"\n        rr=dict(r)\n        rr[\"target_element\"]=target\n        rr[\"target_ElementId\"]=eid(target)\n        rr[\"match_distance_ft\"]=d\n        rr[\"match_method\"]=method\n        match_records.append(rr)\n\n    matched=[r for r in match_records if r[\"target_element\"] is not None]\n    target_ids=[r[\"target_ElementId\"] for r in matched]\n    duplicate_targets=sorted([k for k,c in Counter(target_ids).items() if k is not None and c>1])\n    distances=[r[\"match_distance_ft\"] for r in matched if r[\"match_distance_ft\"] is not None]\n    max_dist=max(distances) if distances else None\n    mean_dist=sum(distances)/float(len(distances)) if distances else None\n    over_limit=[r for r in matched if r[\"match_distance_ft\"] is not None and r[\"match_distance_ft\"]>MAX_MATCH_DISTANCE_FT]\n\n    # --------------------------------------------------------\n    # D. Safety gate + write\n    # --------------------------------------------------------\n    block=[]\n    if len(rows)==0: block.append(\"no native UV tiles\")\n    if selection_match_ratio < 0.98: block.append(\"Select Divided Surface Families does not match selected DividedSurface\")\n    if duplicate_grid_instances: block.append(\"native instance mapped to multiple GridNodes\")\n    if dup_ids: block.append(\"duplicate candidate IDs\")\n    if dup_coords: block.append(\"duplicate U/V coordinates\")\n    if len(matched)!=len(rows): block.append(\"not all native tiles matched to project panels\")\n    if duplicate_targets: block.append(\"multiple native tiles matched to same project panel\")\n    if over_limit: block.append(\"project-panel match distance exceeds safety limit\")\n    if sector_code is None: block.append(\"invalid sector code\")\n\n    write_failures=[]\n    written=0\n    if WRITE_TO_REVIT and not block:\n        try:\n            TransactionManager.Instance.EnsureInTransaction(doc)\n            for r in matched:\n                e=r[\"target_element\"]\n                vals={\n                    \"HDT_Element_ID\":r[\"HDT_Element_ID\"],\n                    \"HDT_Parent_ID\":PARENT_ID,\n                    \"HDT_Zone\":sector_code,\n                }\n                ok=True\n                for name,value in vals.items():\n                    p=find_param(e,name)\n                    if p is None:\n                        write_failures.append({\"ElementId\":r[\"target_ElementId\"],\"parameter\":name,\"reason\":\"parameter not found\"})\n                        ok=False\n                        continue\n                    try:\n                        if p.IsReadOnly:\n                            write_failures.append({\"ElementId\":r[\"target_ElementId\"],\"parameter\":name,\"reason\":\"read-only\"})\n                            ok=False\n                        else:\n                            p.Set(str(value))\n                    except Exception as ex:\n                        write_failures.append({\"ElementId\":r[\"target_ElementId\"],\"parameter\":name,\"reason\":str(ex)})\n                        ok=False\n                if ok:\n                    written+=1\n            TransactionManager.Instance.TransactionTaskDone()\n            status=\"WRITTEN\" if not write_failures else \"WRITTEN WITH PARAMETER FAILURES\"\n        except Exception as ex:\n            try:\n                TransactionManager.Instance.ForceCloseTransaction()\n            except:\n                pass\n            status=\"WRITE FAILED\"\n            errors.append(\"Transaction: \"+str(ex))\n    else:\n        status=\"BLOCKED: \"+\"; \".join(block) if block else \"PREVIEW ONLY\"\n\n    # --------------------------------------------------------\n    # OUTPUT\n    # --------------------------------------------------------\n    ordered=sorted(match_records,key=lambda r:(r[\"V\"],r[\"U\"]))\n    OUT=[\n        [\"MODE\",\"V20.1 CLEAN ROOF NATIVE UV UNIVERSAL SECTOR WRITER\"],\n        [\"Sector code\",sector_code],\n        [\"Selected DividedSurface ElementId\",eid(ds)],\n        [\"Selected Divided Surface Families count\",len(selected_ids)],\n        [\"Selected roof family/type keys\",sorted(list(selected_keys))],\n        [\"Native GridNode BROWN roof tile count\",len(native_ids)],\n        [\"Excluded native OTHER tiles\",len(excluded_other_native)],\n        [\"Selection/native agreement\",{\n            \"common\":len(common_ids),\n            \"only_selection\":len(only_selection),\n            \"only_grid\":len(only_grid),\n            \"match_ratio\":round(selection_match_ratio,5)\n        }],\n        [\"Grid settings\",{\n            \"API_U_gridlines\":nu,\n            \"API_V_gridlines\":nv,\n            \"UI_U_fixed_number\":getattr(ds.USpacingRule,\"Number\",None),\n            \"UI_V_fixed_number\":getattr(ds.VSpacingRule,\"Number\",None)\n        }],\n        [\"Axis mapping\",{\n            \"Method_U_circumferential_from\":circ_native,\n            \"Method_V_meridional_from\":mer_native,\n            \"native_U_vs_Z\":round(cuZ,5),\n            \"native_V_vs_Z\":round(cvZ,5),\n            \"native_U_vs_angle\":round(cuA,5),\n            \"native_V_vs_angle\":round(cvA,5)\n        }],\n        [\"Methodological grid\",{\n            \"U_positions\":u_positions,\n            \"V_positions\":v_positions,\n            \"candidate_ID_total\":len(ids),\n            \"duplicate_candidate_IDs\":len(dup_ids),\n            \"duplicate_UV_coordinates\":len(dup_coords),\n            \"max_U\":max([r[\"U\"] for r in rows]) if rows else None,\n            \"max_V\":max([r[\"V\"] for r in rows]) if rows else None\n        }],\n        [\"V indexing note\",\"ROOF V positions are based on occupied native GridNode rows, ordered from the higher inner edge toward the lower eave. UI Fixed Number may differ at partial borders.\"],\n        [\"Project panel matching\",{\n            \"project_matching_roof_panels\":len(project_tiles),\n            \"project_panels_with_HDT_params\":len(project_ready),\n            \"matched\":len(matched),\n            \"duplicate_targets\":len(duplicate_targets),\n            \"mean_distance_ft\":round(mean_dist,6) if mean_dist is not None else None,\n            \"max_distance_ft\":round(max_dist,6) if max_dist is not None else None,\n            \"over_limit\":len(over_limit),\n            \"limit_ft\":MAX_MATCH_DISTANCE_FT\n        }],\n        [\"WRITE STATUS\",status],\n        [\"Elements fully written\",written],\n        [\"Parameter write failures\",write_failures[:30]],\n        [\"First 40 final mappings\",[\n            {\n                \"native_ElementId\":r[\"native_ElementId\"],\n                \"project_ElementId\":r[\"target_ElementId\"],\n                \"native_U\":r[\"native_U\"],\n                \"native_V\":r[\"native_V\"],\n                \"U\":r[\"U\"],\n                \"V\":r[\"V\"],\n                \"HDT_Element_ID\":r[\"HDT_Element_ID\"],\n                \"match_distance_ft\":round(r[\"match_distance_ft\"],6) if r[\"match_distance_ft\"] is not None else None\n            }\n            for r in ordered[:40]\n        ]],\n        [\"BLOCK reasons\",block],\n        [\"Errors\",errors[:30]],\n    ]\n",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "121713ca0d2d4095a07fe81d7cf865d2",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "d899a9df2f3147d1988116161900b31d",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "a52ae633268f44ed8a34c9df78ebcf9c",
+          "Name": "IN[1]",
+          "Description": "Input #1",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "6ec2c22bf4384579898fbdd15194c030",
+          "Name": "IN[2]",
+          "Description": "Input #2",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "a5c0e96700cc4280adb59b580648e768",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "Dynamo.Nodes.DSDividedSurfaceFamiliesSelection, DSRevitNodesUI",
+      "NodeType": "ExtensionNode",
+      "InstanceId": [
+        "bec779a9-a7e7-496f-8227-190d8bfe60f8-0009e304"
+      ],
+      "Id": "f91585f657aa4ff29938483482fdb2be",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "94575b6f7b6a429abf3568c2c9136ed3",
+          "Name": "Element",
+          "Description": "The family instances hosted by the selected divided surface.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Select a divided surface and get its family instances."
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.CodeBlockNodeModel, DynamoCore",
+      "Id": "47982846d4f2417b9b01f03748eb7d4c",
+      "NodeType": "CodeBlockNode",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "830ca334bcea45c395cc350955b8a1c7",
+          "Name": "string",
+          "Description": "\"S07\"",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Allows for DesignScript code to be authored directly",
+      "Code": "\"S07\";"
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.CodeBlockNodeModel, DynamoCore",
+      "Id": "69ecc003ac624e4ab081a52e69acdfc6",
+      "NodeType": "CodeBlockNode",
+      "Inputs": [],
+      "Outputs": [],
+      "Replication": "Disabled",
+      "Description": "Allows for DesignScript code to be authored directly",
+      "Code": ""
+    }
+  ],
+  "Connectors": [
+    {
+      "Start": "12f8fbda64954d6590475b1b8b1dfcea",
+      "End": "d899a9df2f3147d1988116161900b31d",
+      "Id": "019a3b277f814044b0a5c56a124ce27f",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "94575b6f7b6a429abf3568c2c9136ed3",
+      "End": "a52ae633268f44ed8a34c9df78ebcf9c",
+      "Id": "6605209219d74a2580ec3951e7d683f1",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "830ca334bcea45c395cc350955b8a1c7",
+      "End": "6ec2c22bf4384579898fbdd15194c030",
+      "Id": "9f8847fe797245d18713020a1c3367f0",
+      "IsHidden": "False"
+    }
+  ],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [],
+  "EnableLegacyPolyCurveBehavior": true,
+  "Thumbnail": "",
+  "GraphDocumentationURL": null,
+  "ExtensionWorkspaceData": [
+    {
+      "ExtensionGuid": "28992e1d-abb9-417f-8b1b-05e053bee670",
+      "Name": "Properties",
+      "Version": "3.6",
+      "Data": {}
+    },
+    {
+      "ExtensionGuid": "DFBD9CC0-DB40-457A-939E-8C8555555A9D",
+      "Name": "Generative Design",
+      "Version": "9.1",
+      "Data": {}
+    }
+  ],
+  "Author": "OpenAI / ChatGPT",
+  "Linting": {
+    "activeLinter": "None",
+    "activeLinterId": "7b75fb44-43fd-4631-a878-29f4d5d8399a",
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "3.6.1.9895",
+      "RunType": "Manual",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "_Background Preview",
+      "EyeX": -26.678817749023438,
+      "EyeY": 27.087509155273438,
+      "EyeZ": 62.898738861083984,
+      "LookX": 14.95157241821289,
+      "LookY": -16.197538375854492,
+      "LookZ": -72.26593780517578,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    "ConnectorPins": [],
+    "NodeViews": [
+      {
+        "Id": "cae07dd4fda94ca69bede986eaaa41c6",
+        "Name": "Select Model Element",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 200.0,
+        "Y": 250.0
+      },
+      {
+        "Id": "121713ca0d2d4095a07fe81d7cf865d2",
+        "Name": "Python Script",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 850.0,
+        "Y": 300.0
+      },
+      {
+        "Id": "f91585f657aa4ff29938483482fdb2be",
+        "Name": "Select Divided Surface Families",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 200.0,
+        "Y": 500.0
+      },
+      {
+        "Id": "47982846d4f2417b9b01f03748eb7d4c",
+        "Name": "SECTOR CODE - CHANGE S01 TO S07",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 650.0,
+        "Y": 500.0
+      },
+      {
+        "Id": "69ecc003ac624e4ab081a52e69acdfc6",
+        "Name": "Code Block",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 170.0,
+        "Y": 738.0
+      }
+    ],
+    "Annotations": [
+      {
+        "Id": "e475f64ccd1e46f5b35d837f6ff8c936",
+        "Title": "ROOF 01 - HOW TO RUN EACH SECTOR",
+        "DescriptionText": null,
+        "IsExpanded": true,
+        "WidthAdjustment": 0.0,
+        "HeightAdjustment": 0.0,
+        "Nodes": [],
+        "HasNestedGroups": false,
+        "Left": 150.0,
+        "Top": 60.0,
+        "Width": 0.0,
+        "Height": 0.0,
+        "FontSize": 36.0,
+        "GroupStyleId": "00000000-0000-0000-0000-000000000000",
+        "InitialTop": 0.0,
+        "InitialHeight": 0.0,
+        "TextblockHeight": 0.0,
+        "Background": "#FFC1D676"
+      }
+    ],
+    "X": -213.0308418294382,
+    "Y": -122.70221111308291,
+    "Zoom": 0.9051318956990646
+  }
+}
