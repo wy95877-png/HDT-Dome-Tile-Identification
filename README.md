@@ -1,5 +1,8 @@
 # HDT Dome and Roof Tile Identification
 
+**Version 2.0.0**  
+**Zenodo DOI:** [10.5281/zenodo.24502303](https://doi.org/10.5281/zenodo.24502303)
+
 This repository contains the Dynamo workflows and Python implementations developed for automated component-level identification of tiled elements within an HBIM model of the Hermitage of San Bernat.
 
 The workflows support geometric-semantic structuring of repetitive heritage components for Historic Digital Twin (HDT) development by assigning persistent identifiers and HDT-oriented parameters to individual Revit curtain-panel instances.
@@ -128,4 +131,8 @@ This software was developed as part of a geometric-semantic HBIM framework for o
 
 ## Citation
 
-If you use this software, please cite the associated software record and the related research publication. Citation metadata are provided in `CITATION.cff`.
+If you use this software, please cite the archived software release:
+
+**Wang, Y. (2026). _HDT Dome and Roof Tile Identification_ (Version 2.0.0). Zenodo. https://doi.org/10.5281/zenodo.24502303**
+
+Citation metadata are also provided in `CITATION.cff`.
